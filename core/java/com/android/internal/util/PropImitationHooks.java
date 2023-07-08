@@ -72,17 +72,6 @@ public class PropImitationHooks {
     private static final String PROP_SECURITY_PATCH = "persist.sys.pihooks.security_patch";
     private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.first_api_level";
 
-    private static final Map<String, String> sPixelNineProps = Map.of(
-            "PRODUCT", "caiman",
-            "DEVICE", "caiman",
-            "HARDWARE", "caiman",
-            "MANUFACTURER", "Google",
-            "BRAND", "google",
-            "MODEL", "Pixel 9 Pro",
-            "ID", "AP4A.250205.002.B2",
-            "FINGERPRINT", "google/caiman/caiman:15/AP4A.250205.002.B2/12846183:user/release-keys"
-    );
-
     private static final Map<String, String> sPixelFiveProps = Map.of(
             "PRODUCT", "barbet",
             "DEVICE", "barbet",
@@ -145,7 +134,7 @@ public class PropImitationHooks {
     private static volatile String sStockFp;
 
     private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsFinsky, sIsPhotos;
+    private static volatile boolean sIsGms, sIsFinsky, sIsPhotos, sIsPixelLauncher, sIsASI;
 
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
@@ -168,6 +157,8 @@ public class PropImitationHooks {
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
         sIsFinsky = packageName.equals(PACKAGE_FINSKY);
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
+        sIsPixelLauncher = packageName.equals(PACKAGE_NEXUSLAUNCHER);
+        sIsASI = packageName.equals(PACKAGE_ASI);
 
         /* Set certified properties for GMSCore
          * Set Pixel 9 for Google and GMS device configurator
@@ -193,11 +184,6 @@ public class PropImitationHooks {
         }
 
         switch (packageName) {
-            case PACKAGE_NEXUSLAUNCHER:
-            case PACKAGE_ASI:
-                dlog("Spoofing Pixel 9 Pro for: " + packageName + " process: " + processName);
-                setProps(sPixelNineProps);
-                return;
             case PACKAGE_GPHOTOS:
                 dlog("Spoofing Pixel XL for Google Photos");
                 setProps(sPixelXLProps);
@@ -244,6 +230,14 @@ public class PropImitationHooks {
                 dlog("Enabled system feature " + name + " for Google Photos");
                 has = true;
             }
+        }
+        if (sIsASI && has && sTensorFeatures.stream().anyMatch(name::contains)) {
+            dlog("Blocked system feature " + name + " for ASI");
+            return false;
+        }
+        if (sIsPixelLauncher && has && sTensorFeatures.stream().anyMatch(name::contains)) {
+            dlog("Blocked system feature " + name + " for Pixel Launcher");
+            return false;
         }
         return has;
     }
