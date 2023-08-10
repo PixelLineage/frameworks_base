@@ -6344,4 +6344,8 @@
 
   <!-- Action for opening trusted location settings page -->
   <java-symbol type="string" name="trusted_location_settings_action" />
+
+  <!-- Define device configs on boot -->
+  <java-symbol type="array" name="global_device_configs_override" />
+  <java-symbol type="array" name="device_configs_override" />
 </resources>

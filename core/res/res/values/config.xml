@@ -7761,4 +7761,10 @@
         It can only contain non-AOSP permissions outside of the android.*
         and com.android.* namespace. -->
     <string-array name="config_watchFacePermissions" translatable="false"/>
+
+    <!-- Define device configs on boot -->
+    <string-array name="global_device_configs_override" translatable="false">
+    </string-array>
+    <string-array name="device_configs_override" translatable="false">
+    </string-array>
 </resources>
