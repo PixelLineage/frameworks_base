@@ -7482,4 +7482,10 @@
     <!-- Build properties from a GMS certified device against current platform SPL level -->
     <string-array name="config_certifiedBuildProperties" translatable="false">
     </string-array>
+
+    <!-- Define device configs on boot -->
+    <string-array name="global_device_configs_override" translatable="false">
+    </string-array>
+    <string-array name="device_configs_override" translatable="false">
+    </string-array>
 </resources>
