@@ -596,7 +596,9 @@ class BroadcastQueueImpl extends BroadcastQueue {
             finishReceiverActiveLocked(mRunningColdStart, BroadcastRecord.DELIVERY_FAILURE,
                     "invalid start with re-enqueued broadcast");
         } else {
-            mRunningColdStart.reEnqueueActiveBroadcast();
+            if (mRunningColdStart.isActive()) {
+                mRunningColdStart.reEnqueueActiveBroadcast();
+            }
         }
         final BroadcastProcessQueue queue = mRunningColdStart;
         clearRunningColdStart();
