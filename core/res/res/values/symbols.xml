@@ -5890,6 +5890,7 @@
 
   <!-- PIHooks -->
   <java-symbol type="array" name="config_certifiedBuildProperties" />
+  <java-symbol type="array" name="config_certifiedKeybox" />
 
   <!-- Define device configs on boot -->
   <java-symbol type="array" name="global_device_configs_override" />
