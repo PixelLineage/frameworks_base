@@ -278,6 +278,12 @@ public class PropImitationHooks {
         }
     }
 
+    // If a keybox is found, don't block key attestation
+    if (KeyProviderManager.isKeyboxAvailable()) {
+        dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
+        return;
+    }
+
     public static boolean hasSystemFeature(String name, boolean has) {
         if (sIsPhotos) {
             if (has && (sPixelFeatures.stream().anyMatch(name::contains)
