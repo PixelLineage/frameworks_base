@@ -7303,4 +7303,7 @@
     </string-array>
     <string-array name="device_configs_override" translatable="false">
     </string-array>
+
+    <!-- Album art max bitmap size -->
+    <integer name="config_maxBitmapSizePx">480</integer>
 </resources>
