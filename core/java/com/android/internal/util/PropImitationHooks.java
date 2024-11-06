@@ -88,8 +88,8 @@ public class PropImitationHooks {
             "MANUFACTURER", "Google",
             "BRAND", "google",
             "MODEL", "Pixel Fold",
-            "ID", "AP2A.240905.003",
-            "FINGERPRINT", "google/felix/felix:14/AP2A.240905.003/12231197:user/release-keys"
+            "ID", "AP3A.241005.015.A2",
+            "FINGERPRINT", "google/felix/felix:15/AP3A.241005.015.A2/12426170:user/release-keys"
     );
 
     private static final Map<String, String> sPixelXLProps = Map.of(
