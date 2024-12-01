@@ -19,7 +19,6 @@
 
 package com.android.internal.util;
 
-import android.app.ActivityTaskManager;
 import android.app.Application;
 import android.app.TaskStackListener;
 import android.content.ComponentName;
@@ -47,16 +46,13 @@ public class PropImitationHooks {
     private static final String TAG = "PropImitationHooks";
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
-    private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
-    private static final String PACKAGE_VELVET = "com.google.android.googlequicksearchbox";
 
     private static final String G_ONE = "com.pubg.imobile";
-    private static final String G_TWO = "com.pubg.krmobile";
-    private static final String G_THR = "com.rekoo.pubgm";
+    private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
+    private static final String G_THR = "com.activision.callofduty.shooter";
     private static final String G_FOU = "com.tencent.tmgp.pubgmhd";
-    private static final String G_FIV = "com.vng.pubgmobile";
 
     private static final String PROCESS_GMS_GAPPS = PACKAGE_GMS + ".gapps";
     private static final String PROCESS_GMS_GSERVICE = PACKAGE_GMS + ".gservice";
@@ -69,18 +65,15 @@ public class PropImitationHooks {
     private static final String PROP_SECURITY_PATCH = "persist.sys.pihooks.security_patch";
     private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.first_api_level";
 
-    private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
-            "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
-
-    private static final Map<String, String> sPixelSixProps = Map.of(
-            "PRODUCT", "raven",
-            "DEVICE", "raven",
-            "HARDWARE", "raven",
+    private static final Map<String, String> sPixelFiveProps = Map.of(
+            "PRODUCT", "barbet",
+            "DEVICE", "barbet",
+            "HARDWARE", "barbet",
             "MANUFACTURER", "Google",
             "BRAND", "google",
-            "MODEL", "Pixel 6 Pro",
-            "ID", "AP2A.240805.005",
-            "FINGERPRINT", "google/raven/raven:14/AP2A.240805.005/12043167:user/release-keys"
+            "MODEL", "Pixel 5a",
+            "ID", "AP2A.240805.005.S4",
+            "FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005.S4/12281092:user/release-keys"
     );
 
     private static final Map<String, String> sPixelXLProps = Map.of(
@@ -95,8 +88,18 @@ public class PropImitationHooks {
     );
 
     private static final Map<String, String> sGameProps = Map.of(
-            "MANUFACTURER", "OnePlus",
-            "MODEL", "IN2020"
+            "MANUFACTURER", "samsung",
+            "MODEL", "SM-S928B"
+    );
+
+    private static final Map<String, String> sGamePropsTwo = Map.of(
+            "MANUFACTURER", "Sony",
+            "MODEL", "XQ-BC62"
+    );
+
+    private static final Map<String, String> sGamePropsThr = Map.of(
+            "MANUFACTURER", "Lenovo",
+            "MODEL", "TB-9707F"
     );
 
     private static final Set<String> sNexusFeatures = Set.of(
@@ -121,15 +124,9 @@ public class PropImitationHooks {
             "PIXEL_2021_MIDYEAR_EXPERIENCE"
     );
 
-    private static final Set<String> sTensorFeatures = Set.of(
-            "PIXEL_2021_EXPERIENCE"
-    );
-
     private static volatile String[] sCertifiedProps;
-    private static volatile String sStockFp;
-
     private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsFinsky, sIsPhotos;
+    private static volatile boolean sIsPhotos;
 
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
@@ -147,15 +144,11 @@ public class PropImitationHooks {
         }
 
         sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
-        sStockFp = res.getString(R.string.config_stockFingerprint);
-
         sProcessName = processName;
-        sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
-        sIsFinsky = packageName.equals(PACKAGE_FINSKY);
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
 
         /* Set certified properties for GMSCore
-         * Set Pixel 6 Pro for Google (Circle Search) and GMS device configurator
+         * Set Pixel 9 for Google and GMS device configurator
          * Set Pixel XL for Google Photos
          */
 
@@ -170,27 +163,25 @@ public class PropImitationHooks {
             case PROCESS_GMS_LEARNING:
             case PROCESS_GMS_SEARCH:
             case PROCESS_GMS_UPDATE:
-                dlog("Spoofing Pixel 6 Pro for: " + packageName + " process: " + processName);
-                setProps(sPixelSixProps);
+                dlog("Spoofing Pixel 5a for: " + packageName + " process: " + processName);
+                setProps(sPixelFiveProps);
                 return;
         }
 
         switch (packageName) {
-            case PACKAGE_GMS:
-            case PACKAGE_VELVET:
-                dlog("Spoofing Pixel 6 Pro for: " + packageName + " process: " + processName);
-                setProps(sPixelSixProps);
-                return;
             case PACKAGE_GPHOTOS:
                 dlog("Spoofing Pixel XL for Google Photos");
                 setProps(sPixelXLProps);
                 return;
             case G_ONE:
-            case G_TWO:
-            case G_THR:
             case G_FOU:
-            case G_FIV:
                 setProps(sGameProps);
+                return;
+            case G_TWO:
+                setProps(sGamePropsTwo);
+                return;
+            case G_THR:
+                setProps(sGamePropsThr);
                 return;
         }
     }
@@ -221,29 +212,9 @@ public class PropImitationHooks {
         if (sCertifiedProps.length == 0) {
             dlog("Certified props are not set");
             return;
-        }
-        final boolean was = isGmsAddAccountActivityOnTop();
-        final TaskStackListener taskStackListener = new TaskStackListener() {
-            @Override
-            public void onTaskStackChanged() {
-                final boolean is = isGmsAddAccountActivityOnTop();
-                if (is ^ was) {
-                    dlog("GmsAddAccountActivityOnTop is:" + is + " was:" + was +
-                            ", killing myself!"); // process will restart automatically later
-                    Process.killProcess(Process.myPid());
-                }
-            }
-        };
-        if (!was) {
+        } else {
             dlog("Spoofing build for GMS");
             setCertifiedProps();
-        } else {
-            dlog("Skip spoofing build for GMS, because GmsAddAccountActivityOnTop");
-        }
-        try {
-            ActivityTaskManager.getService().registerTaskStackListener(taskStackListener);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to register task stack listener!", e);
         }
     }
 
@@ -271,49 +242,9 @@ public class PropImitationHooks {
         }
     }
 
-    private static boolean isGmsAddAccountActivityOnTop() {
-        try {
-            final ActivityTaskManager.RootTaskInfo focusedTask =
-                    ActivityTaskManager.getService().getFocusedRootTaskInfo();
-            return focusedTask != null && focusedTask.topActivity != null
-                    && focusedTask.topActivity.equals(GMS_ADD_ACCOUNT_ACTIVITY);
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to get top activity!", e);
-        }
-        return false;
-    }
-
-    public static boolean shouldBypassTaskPermission(Context context) {
-        // GMS doesn't have MANAGE_ACTIVITY_TASKS permission
-        final int callingUid = Binder.getCallingUid();
-        final int gmsUid;
-        try {
-            gmsUid = context.getPackageManager().getApplicationInfo(PACKAGE_GMS, 0).uid;
-            dlog("shouldBypassTaskPermission: gmsUid:" + gmsUid + " callingUid:" + callingUid);
-        } catch (Exception e) {
-            Log.e(TAG, "shouldBypassTaskPermission: unable to get gms uid", e);
-            return false;
-        }
-        return gmsUid == callingUid;
-    }
-
-    private static boolean isCallerSafetyNet() {
-        return sIsGms && Arrays.stream(Thread.currentThread().getStackTrace())
-                .anyMatch(elem -> elem.getClassName().contains("DroidGuard"));
-    }
-
-    public static void onEngineGetCertificateChain() {
-        // Check stack for SafetyNet or Play Integrity
-        if (isCallerSafetyNet() || sIsFinsky) {
-            dlog("Blocked key attestation sIsGms=" + sIsGms + " sIsFinsky=" + sIsFinsky);
-            throw new UnsupportedOperationException();
-        }
-    }
-
     public static boolean hasSystemFeature(String name, boolean has) {
         if (sIsPhotos) {
-            if (has && (sPixelFeatures.stream().anyMatch(name::contains)
-                    || sTensorFeatures.stream().anyMatch(name::contains))) {
+            if (has && (sPixelFeatures.stream().anyMatch(name::contains))) {
                 dlog("Blocked system feature " + name + " for Google Photos");
                 has = false;
             } else if (!has && sNexusFeatures.stream().anyMatch(name::contains)) {
