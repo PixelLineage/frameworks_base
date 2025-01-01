@@ -466,8 +466,7 @@ public abstract class SystemUIModule {
     @Provides
     static SettingsProxy.CurrentUserIdProvider provideCurrentUserId(UserTracker userTracker) {
         return userTracker::getUserId;
-    }
-
+    
     @Provides
     @SysUISingleton
     static KeyguardSmartspaceController provideKeyguardSmartspaceController(FeatureFlags featureFlags,
