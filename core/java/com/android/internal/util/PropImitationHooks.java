@@ -47,10 +47,13 @@ public class PropImitationHooks {
     private static final String TAG = "PropImitationHooks";
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
+    private static final String PACKAGE_ARCORE = "com.google.ar.core";
     private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
     private static final String PACKAGE_VELVET = "com.google.android.googlequicksearchbox";
+    private static final String PACKAGE_ASI = "com.google.android.as";
+    private static final String PACKAGE_NEXUSLAUNCHER = "com.google.android.apps.nexuslauncher";
 
     private static final String G_ONE = "com.pubg.imobile";
     private static final String G_TWO = "com.pubg.krmobile";
@@ -72,15 +75,26 @@ public class PropImitationHooks {
     private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
             "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
 
-    private static final Map<String, String> sPixelSixProps = Map.of(
-            "PRODUCT", "raven",
-            "DEVICE", "raven",
-            "HARDWARE", "raven",
+    private static final Map<String, String> sPixelNineProps = Map.of(
+            "PRODUCT", "caiman",
+            "DEVICE", "caiman",
+            "HARDWARE", "caiman",
             "MANUFACTURER", "Google",
             "BRAND", "google",
-            "MODEL", "Pixel 6 Pro",
-            "ID", "AP4A.241205.013.A2",
-            "FINGERPRINT", "google/raven/raven:15/AP4A.241205.013.A2/12649814:user/release-keys"
+            "MODEL", "Pixel 9 Pro",
+            "ID", "AP4A.250205.002.B2",
+            "FINGERPRINT", "google/caiman/caiman:15/AP4A.250205.002.B2/12846183:user/release-keys"
+    );
+
+    private static final Map<String, String> sPixelSixProps = Map.of(
+            "PRODUCT", "barbet",
+            "DEVICE", "barbet",
+            "HARDWARE", "barbet",
+            "MANUFACTURER", "Google",
+            "BRAND", "google",
+            "MODEL", "Pixel 5a",
+            "ID", "AP2A.240805.005.S4",
+            "FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005.S4/12281092:user/release-keys"
     );
 
     private static final Map<String, String> sPixelXLProps = Map.of(
@@ -122,7 +136,13 @@ public class PropImitationHooks {
     );
 
     private static final Set<String> sTensorFeatures = Set.of(
-            "PIXEL_2021_EXPERIENCE"
+            "PIXEL_2021_EXPERIENCE",
+            "PIXEL_2022_EXPERIENCE",
+            "PIXEL_2022_MIDYEAR_EXPERIENCE",
+            "PIXEL_2023_EXPERIENCE",
+            "PIXEL_2023_MIDYEAR_EXPERIENCE",
+            "PIXEL_2024_EXPERIENCE",
+            "PIXEL_2024_MIDYEAR_EXPERIENCE"
     );
 
     private static volatile String[] sCertifiedProps;
@@ -175,11 +195,19 @@ public class PropImitationHooks {
                 return;
         }
 
+        if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
+            dlog("Setting stock fingerprint for: " + packageName);
+            setPropValue("FINGERPRINT", sStockFp);
+            return;
+        }
+
         switch (packageName) {
             case PACKAGE_GMS:
+            case PACKAGE_NEXUSLAUNCHER:
+            case PACKAGE_ASI:
             case PACKAGE_VELVET:
                 dlog("Spoofing Pixel 6 Pro for: " + packageName + " process: " + processName);
-                setProps(sPixelSixProps);
+                setProps(sPixelNineProps);
                 return;
             case PACKAGE_GPHOTOS:
                 dlog("Spoofing Pixel XL for Google Photos");
