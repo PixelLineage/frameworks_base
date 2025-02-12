@@ -47,13 +47,9 @@ public class PropImitationHooks {
     private static final String TAG = "PropImitationHooks";
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
-    private static final String PACKAGE_ARCORE = "com.google.ar.core";
     private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
-    private static final String PACKAGE_VELVET = "com.google.android.googlequicksearchbox";
-    private static final String PACKAGE_ASI = "com.google.android.as";
-    private static final String PACKAGE_NEXUSLAUNCHER = "com.google.android.apps.nexuslauncher";
 
     private static final String G_ONE = "com.pubg.imobile";
     private static final String G_TWO = "com.pubg.krmobile";
@@ -130,23 +126,10 @@ public class PropImitationHooks {
             "PIXEL_2019_MIDYEAR_EXPERIENCE",
             "PIXEL_2019_MIDYEAR_PRELOAD",
             "PIXEL_2019_PRELOAD",
-            "PIXEL_2020_EXPERIENCE",
-            "PIXEL_2020_MIDYEAR_EXPERIENCE",
-            "PIXEL_2021_MIDYEAR_EXPERIENCE"
-    );
-
-    private static final Set<String> sTensorFeatures = Set.of(
-            "PIXEL_2021_EXPERIENCE",
-            "PIXEL_2022_EXPERIENCE",
-            "PIXEL_2022_MIDYEAR_EXPERIENCE",
-            "PIXEL_2023_EXPERIENCE",
-            "PIXEL_2023_MIDYEAR_EXPERIENCE",
-            "PIXEL_2024_EXPERIENCE",
-            "PIXEL_2024_MIDYEAR_EXPERIENCE"
+            "PIXEL_2020_EXPERIENCE"
     );
 
     private static volatile String[] sCertifiedProps;
-    private static volatile String sStockFp;
 
     private static volatile String sProcessName;
     private static volatile boolean sIsGms, sIsFinsky, sIsPhotos;
@@ -167,7 +150,6 @@ public class PropImitationHooks {
         }
 
         sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
-        sStockFp = res.getString(R.string.config_stockFingerprint);
 
         sProcessName = processName;
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
@@ -195,17 +177,8 @@ public class PropImitationHooks {
                 return;
         }
 
-        if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
-            dlog("Setting stock fingerprint for: " + packageName);
-            setPropValue("FINGERPRINT", sStockFp);
-            return;
-        }
-
         switch (packageName) {
             case PACKAGE_GMS:
-            case PACKAGE_NEXUSLAUNCHER:
-            case PACKAGE_ASI:
-            case PACKAGE_VELVET:
                 dlog("Spoofing Pixel 6 Pro for: " + packageName + " process: " + processName);
                 setProps(sPixelNineProps);
                 return;
@@ -340,8 +313,7 @@ public class PropImitationHooks {
 
     public static boolean hasSystemFeature(String name, boolean has) {
         if (sIsPhotos) {
-            if (has && (sPixelFeatures.stream().anyMatch(name::contains)
-                    || sTensorFeatures.stream().anyMatch(name::contains))) {
+            if (has && (sPixelFeatures.stream().anyMatch(name::contains))) {
                 dlog("Blocked system feature " + name + " for Google Photos");
                 has = false;
             } else if (!has && sNexusFeatures.stream().anyMatch(name::contains)) {
