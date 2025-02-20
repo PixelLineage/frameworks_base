@@ -652,7 +652,6 @@ public final class LocalFloatingToolbarPopup implements FloatingToolbarPopup {
         overflowButtonAnimation.setInterpolator(mFastOutSlowInInterpolator);
         overflowButtonAnimation.setDuration(getAdjustedDuration(250));
         mOpenOverflowAnimation.getAnimations().clear();
-        mOpenOverflowAnimation.getAnimations().clear();
         mOpenOverflowAnimation.addAnimation(widthAnimation);
         mOpenOverflowAnimation.addAnimation(heightAnimation);
         mOpenOverflowAnimation.addAnimation(overflowButtonAnimation);
