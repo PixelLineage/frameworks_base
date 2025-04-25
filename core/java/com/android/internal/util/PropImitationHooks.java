@@ -203,11 +203,8 @@ public class PropImitationHooks {
         }
 
         switch (packageName) {
-            case PACKAGE_GMS:
             case PACKAGE_NEXUSLAUNCHER:
             case PACKAGE_ASI:
-            case PACKAGE_VELVET:
-            case PACKAGE_WALLPAPER:
                 dlog("Spoofing Pixel 9 Pro for: " + packageName + " process: " + processName);
                 setProps(sPixelNineProps);
                 return;
