@@ -146,6 +146,7 @@ public class PropImitationHooks {
             "PIXEL_2024_MIDYEAR_EXPERIENCE"
     );
 
+    private static volatile String[] sCertifiedProps;
     private static volatile String sStockFp;
 
     private static volatile String sProcessName;
@@ -166,6 +167,7 @@ public class PropImitationHooks {
             return;
         }
 
+        sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
         sStockFp = res.getString(R.string.config_stockFingerprint);
 
         sProcessName = processName;
@@ -179,6 +181,10 @@ public class PropImitationHooks {
          */
 
         switch (processName) {
+            case PROCESS_GMS_UNSTABLE:
+                dlog("Setting certified props for: " + packageName + " process: " + processName);
+                setCertifiedPropsForGms();
+                return;
             case PROCESS_GMS_PERSISTENT:
             case PROCESS_GMS_GAPPS:
             case PROCESS_GMS_GSERVICE:
@@ -235,6 +241,40 @@ public class PropImitationHooks {
             field.setAccessible(false);
         } catch (Exception e) {
             Log.e(TAG, "Failed to set prop " + key, e);
+        }
+    }
+
+    private static void setCertifiedPropsForGms() {
+        if (sCertifiedProps.length == 0) {
+            dlog("Certified props are not set");
+            return;
+        } else {
+            dlog("Spoofing build for GMS");
+            setCertifiedProps();
+        }
+    }
+
+    private static void setCertifiedProps() {
+        for (String entry : sCertifiedProps) {
+            // Each entry must be of the format FIELD:value
+            final String[] fieldAndProp = entry.split(":", 2);
+            if (fieldAndProp.length != 2) {
+                Log.e(TAG, "Invalid entry in certified props: " + entry);
+                continue;
+            }
+            setPropValue(fieldAndProp[0], fieldAndProp[1]);
+        }
+        setSystemProperty(PROP_SECURITY_PATCH, Build.VERSION.SECURITY_PATCH);
+        setSystemProperty(PROP_FIRST_API_LEVEL,
+                Integer.toString(Build.VERSION.DEVICE_INITIAL_SDK_INT));
+    }
+
+    private static void setSystemProperty(String name, String value) {
+        try {
+            SystemProperties.set(name, value);
+            dlog("Set system prop " + name + "=" + value);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set system prop " + name + "=" + value, e);
         }
     }
 
