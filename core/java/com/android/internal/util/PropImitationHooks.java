@@ -47,10 +47,8 @@ public class PropImitationHooks {
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
     private static final String PACKAGE_ARCORE = "com.google.ar.core";
-    private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
-    private static final String PACKAGE_VELVET = "com.google.android.googlequicksearchbox";
     private static final String PACKAGE_ASI = "com.google.android.as";
     private static final String PACKAGE_NEXUSLAUNCHER = "com.google.android.apps.nexuslauncher";
     private static final String PACKAGE_WALLPAPER = "com.google.android.apps.wallpaper";
@@ -131,10 +129,11 @@ public class PropImitationHooks {
             "PIXEL_2024_MIDYEAR_EXPERIENCE"
     );
 
+    private static volatile String[] sCertifiedProps;
     private static volatile String sStockFp;
 
     private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsFinsky, sIsPhotos, sIsPixelLauncher, sIsASI;
+    private static volatile boolean sIsPhotos, sIsPixelLauncher, sIsASI;
 
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
@@ -151,11 +150,10 @@ public class PropImitationHooks {
             return;
         }
 
+        sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
         sStockFp = res.getString(R.string.config_stockFingerprint);
 
         sProcessName = processName;
-        sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
-        sIsFinsky = packageName.equals(PACKAGE_FINSKY);
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
         sIsPixelLauncher = packageName.equals(PACKAGE_NEXUSLAUNCHER);
         sIsASI = packageName.equals(PACKAGE_ASI);
@@ -166,6 +164,10 @@ public class PropImitationHooks {
          */
 
         switch (processName) {
+            case PROCESS_GMS_UNSTABLE:
+                dlog("Setting certified props for: " + packageName + " process: " + processName);
+                setCertifiedPropsForGms();
+                return;
             case PROCESS_GMS_PERSISTENT:
             case PROCESS_GMS_GAPPS:
             case PROCESS_GMS_GSERVICE:
@@ -217,6 +219,40 @@ public class PropImitationHooks {
             field.setAccessible(false);
         } catch (Exception e) {
             Log.e(TAG, "Failed to set prop " + key, e);
+        }
+    }
+
+    private static void setCertifiedPropsForGms() {
+        if (sCertifiedProps.length == 0) {
+            dlog("Certified props are not set");
+            return;
+        } else {
+            dlog("Spoofing build for GMS");
+            setCertifiedProps();
+        }
+    }
+
+    private static void setCertifiedProps() {
+        for (String entry : sCertifiedProps) {
+            // Each entry must be of the format FIELD:value
+            final String[] fieldAndProp = entry.split(":", 2);
+            if (fieldAndProp.length != 2) {
+                Log.e(TAG, "Invalid entry in certified props: " + entry);
+                continue;
+            }
+            setPropValue(fieldAndProp[0], fieldAndProp[1]);
+        }
+        setSystemProperty(PROP_SECURITY_PATCH, Build.VERSION.SECURITY_PATCH);
+        setSystemProperty(PROP_FIRST_API_LEVEL,
+                Integer.toString(Build.VERSION.DEVICE_INITIAL_SDK_INT));
+    }
+
+    private static void setSystemProperty(String name, String value) {
+        try {
+            SystemProperties.set(name, value);
+            dlog("Set system prop " + name + "=" + value);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to set system prop " + name + "=" + value, e);
         }
     }
 
