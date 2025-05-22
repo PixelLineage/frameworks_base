@@ -7302,5 +7302,5 @@
     </string-array>
 
     <!-- Album art max bitmap size -->
-    <integer name="config_maxBitmapSizePx">480</integer>
+    <integer name="config_maxBitmapSizePx">700</integer>
 </resources>
