@@ -278,10 +278,12 @@ public class PropImitationHooks {
         }
     }
 
+    public static void onEngineGetCertificateChain() {
     // If a keybox is found, don't block key attestation
-    if (KeyProviderManager.isKeyboxAvailable()) {
-        dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
-        return;
+        if (KeyProviderManager.isKeyboxAvailable()) {
+            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
+            return;
+        }
     }
 
     public static boolean hasSystemFeature(String name, boolean has) {
