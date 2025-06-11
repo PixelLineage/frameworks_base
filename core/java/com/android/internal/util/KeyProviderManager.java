@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.android.internal.R;
 
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,17 +22,14 @@ import java.util.Map;
 public final class KeyProviderManager {
     private static final String TAG = "KeyProviderManager";
 
-    private static final IKeyboxProvider PROVIDER = new DefaultKeyboxProvider();
-
-    private KeyProviderManager() {
-    }
+    private KeyProviderManager() {}
 
     public static IKeyboxProvider getProvider() {
-        return PROVIDER;
+        return new DefaultKeyboxProvider();
     }
 
     public static boolean isKeyboxAvailable() {
-        return PROVIDER.hasKeybox();
+        return getProvider().hasKeybox();
     }
 
     private static class DefaultKeyboxProvider implements IKeyboxProvider {
@@ -43,16 +41,19 @@ public final class KeyProviderManager {
                 Log.e(TAG, "Failed to get application context");
                 return;
             }
+            loadFromConfigArray(context);
+        }
 
-            String[] keybox = context.getResources().getStringArray(R.array.config_certifiedKeybox);
-
-            Arrays.stream(keybox)
-                    .map(entry -> entry.split(":", 2))
-                    .filter(parts -> parts.length == 2)
-                    .forEach(parts -> keyboxData.put(parts[0], parts[1]));
+        private void loadFromConfigArray(Context ctx) {
+            for (String entry : ctx.getResources().getStringArray(R.array.config_certifiedKeybox)) {
+                String[] parts = entry.split(":", 2);
+                if (parts.length == 2) {
+                    keyboxData.put(parts[0], parts[1]);
+                }
+            }
 
             if (!hasKeybox()) {
-                Log.w(TAG, "Incomplete keybox data loaded");
+                Log.w(TAG, "Incomplete keybox provided by overlays");
             }
         }
 
