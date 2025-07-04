@@ -177,15 +177,15 @@ public class ActionChain {
     private Transition expectCollecting() {
         final Transition transition = getTransition();
         if (transition == null) {
-            Slog.e(TAG, "Can't collect into a chain with no transition");
+            Slog.d(TAG, "Can't collect into a chain with no transition");
             return null;
         }
         if (isFinishing()) {
-            Slog.e(TAG, "Trying to collect into a finished transition");
+            Slog.d(TAG, "Trying to collect into a finished transition");
             return null;
         }
         if (transition.mController.getCollectingTransition() != mTransition) {
-            Slog.e(TAG, "Mismatch between current collecting ("
+            Slog.d(TAG, "Mismatch between current collecting ("
                     + transition.mController.getCollectingTransition() + ") and chain ("
                     + transition + ")");
             return null;
