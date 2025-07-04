@@ -695,7 +695,7 @@ public class BiometricScheduler<T, U> {
     public void startWatchdog() {
         final BiometricSchedulerOperation operation = mCurrentOperation;
         if (operation == null) {
-            Slog.e(TAG, "Current operation is null,no need to start watchdog");
+            Slog.d(TAG, "Current operation is null,no need to start watchdog");
             return;
         }
         mHandler.postDelayed(() -> {
