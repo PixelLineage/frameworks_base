@@ -46,12 +46,8 @@ public class PropImitationHooks {
     private static final String TAG = "PropImitationHooks";
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
-    private static final String PACKAGE_ARCORE = "com.google.ar.core";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
-    private static final String PACKAGE_ASI = "com.google.android.as";
-    private static final String PACKAGE_NEXUSLAUNCHER = "com.google.android.apps.nexuslauncher";
-    private static final String PACKAGE_WALLPAPER = "com.google.android.apps.wallpaper";
 
     private static final String G_ONE = "com.pubg.imobile";
     private static final String G_TWO = "com.pubg.krmobile";
@@ -119,21 +115,9 @@ public class PropImitationHooks {
             "PIXEL_2021_MIDYEAR_EXPERIENCE"
     );
 
-    private static final Set<String> sTensorFeatures = Set.of(
-            "PIXEL_2021_EXPERIENCE",
-            "PIXEL_2022_EXPERIENCE",
-            "PIXEL_2022_MIDYEAR_EXPERIENCE",
-            "PIXEL_2023_EXPERIENCE",
-            "PIXEL_2023_MIDYEAR_EXPERIENCE",
-            "PIXEL_2024_EXPERIENCE",
-            "PIXEL_2024_MIDYEAR_EXPERIENCE"
-    );
-
     private static volatile String[] sCertifiedProps;
-    private static volatile String sStockFp;
-
     private static volatile String sProcessName;
-    private static volatile boolean sIsPhotos, sIsPixelLauncher, sIsASI;
+    private static volatile boolean sIsPhotos;
 
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
@@ -151,12 +135,8 @@ public class PropImitationHooks {
         }
 
         sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
-        sStockFp = res.getString(R.string.config_stockFingerprint);
-
         sProcessName = processName;
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
-        sIsPixelLauncher = packageName.equals(PACKAGE_NEXUSLAUNCHER);
-        sIsASI = packageName.equals(PACKAGE_ASI);
 
         /* Set certified properties for GMSCore
          * Set Pixel 9 for Google and GMS device configurator
@@ -177,12 +157,6 @@ public class PropImitationHooks {
                 dlog("Spoofing Pixel 5a for: " + packageName + " process: " + processName);
                 setProps(sPixelFiveProps);
                 return;
-        }
-
-        if (!sStockFp.isEmpty() && packageName.equals(PACKAGE_ARCORE)) {
-            dlog("Setting stock fingerprint for: " + packageName);
-            setPropValue("FINGERPRINT", sStockFp);
-            return;
         }
 
         switch (packageName) {
@@ -258,22 +232,13 @@ public class PropImitationHooks {
 
     public static boolean hasSystemFeature(String name, boolean has) {
         if (sIsPhotos) {
-            if (has && (sPixelFeatures.stream().anyMatch(name::contains)
-                    || sTensorFeatures.stream().anyMatch(name::contains))) {
+            if (has && (sPixelFeatures.stream().anyMatch(name::contains))) {
                 dlog("Blocked system feature " + name + " for Google Photos");
                 has = false;
             } else if (!has && sNexusFeatures.stream().anyMatch(name::contains)) {
                 dlog("Enabled system feature " + name + " for Google Photos");
                 has = true;
             }
-        }
-        if (sIsASI && has && sTensorFeatures.stream().anyMatch(name::contains)) {
-            dlog("Blocked system feature " + name + " for ASI");
-            return false;
-        }
-        if (sIsPixelLauncher && has && sTensorFeatures.stream().anyMatch(name::contains)) {
-            dlog("Blocked system feature " + name + " for Pixel Launcher");
-            return false;
         }
         return has;
     }
