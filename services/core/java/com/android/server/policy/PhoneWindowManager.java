@@ -2655,8 +2655,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 res.getBoolean(com.android.internal.R.bool.config_wakeOnDpadKeyPress);
 
         // Double-tap-to-doze
-        mNativeDoubleTapToDozeAvailable = !TextUtils.isEmpty(
-                mContext.getResources().getString(R.string.config_dozeDoubleTapSensorType));
+        int dtid = mContext.getResources().getIdentifier("config_dozeDoubleTapSensorType", "string", "android");
+        mNativeDoubleTapToDozeAvailable = dtid > 0 && mContext.getResources().getString(dtid).length() > 0;
 
         // Init display burn-in protection
         boolean burnInProtectionEnabled = mContext.getResources().getBoolean(
