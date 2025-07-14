@@ -50,10 +50,9 @@ public class PropImitationHooks {
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
 
     private static final String G_ONE = "com.pubg.imobile";
-    private static final String G_TWO = "com.pubg.krmobile";
-    private static final String G_THR = "com.rekoo.pubgm";
+    private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
+    private static final String G_THR = "com.activision.callofduty.shooter";
     private static final String G_FOU = "com.tencent.tmgp.pubgmhd";
-    private static final String G_FIV = "com.vng.pubgmobile";
 
     private static final String PROCESS_GMS_GAPPS = PACKAGE_GMS + ".gapps";
     private static final String PROCESS_GMS_GSERVICE = PACKAGE_GMS + ".gservice";
@@ -91,6 +90,16 @@ public class PropImitationHooks {
     private static final Map<String, String> sGameProps = Map.of(
             "MANUFACTURER", "samsung",
             "MODEL", "SM-S928B"
+    );
+
+    private static final Map<String, String> sGamePropsTwo = Map.of(
+            "MANUFACTURER", "Sony",
+            "MODEL", "XQ-BC62"
+    );
+
+    private static final Map<String, String> sGamePropsThr = Map.of(
+            "MANUFACTURER", "Lenovo",
+            "MODEL", "TB-9707F"
     );
 
     private static final Set<String> sNexusFeatures = Set.of(
@@ -165,11 +174,14 @@ public class PropImitationHooks {
                 setProps(sPixelXLProps);
                 return;
             case G_ONE:
-            case G_TWO:
-            case G_THR:
             case G_FOU:
-            case G_FIV:
                 setProps(sGameProps);
+                return;
+            case G_TWO:
+                setProps(sGamePropsTwo);
+                return;
+            case G_THR:
+                setProps(sGamePropsThr);
                 return;
         }
     }
