@@ -7704,8 +7704,7 @@ public class AudioService extends IAudioService.Stub
                 return AudioSystem.STREAM_RING;
             }
         default:
-            if (isInCommunication()
-                    || mAudioSystem.isStreamActive(AudioManager.STREAM_VOICE_CALL, 0)) {
+            if (isInCommunication()) {
                 if (!replaceStreamBtSco()
                         && mBtCommDeviceActive.get() == BT_COMM_DEVICE_ACTIVE_SCO) {
                     if (DEBUG_VOL) Log.v(TAG, "getActiveStreamType: Forcing STREAM_BLUETOOTH_SCO");
