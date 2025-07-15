@@ -15128,13 +15128,11 @@ public class AudioService extends IAudioService.Stub
         final String key = "additional_output_device_delay";
         final String reply = AudioSystem.getParameters(
                 key + "=" + device.getInternalType() + "," + device.getAddress());
-        long delayMillis = 0;
-        if (reply.contains(key)) {
-            try {
-                delayMillis = Long.parseLong(reply.substring(key.length() + 1));
-            } catch (NullPointerException e) {
-                delayMillis = 0;
-            }
+        long delayMillis;
+        try {
+            delayMillis = Long.parseLong(reply.substring(key.length() + 1));
+        } catch (NullPointerException e) {
+            delayMillis = 0;
         }
         return delayMillis;
     }
@@ -15160,13 +15158,11 @@ public class AudioService extends IAudioService.Stub
         final String key = "max_additional_output_device_delay";
         final String reply = AudioSystem.getParameters(
                 key + "=" + device.getInternalType() + "," + device.getAddress());
-        long delayMillis = 0;
-        if (reply.contains(key)) {
-            try {
-                delayMillis = Long.parseLong(reply.substring(key.length() + 1));
-            } catch (NullPointerException e) {
-                delayMillis = 0;
-            }
+        long delayMillis;
+        try {
+            delayMillis = Long.parseLong(reply.substring(key.length() + 1));
+        } catch (NullPointerException e) {
+            delayMillis = 0;
         }
         return delayMillis;
     }
