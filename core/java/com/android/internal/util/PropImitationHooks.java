@@ -48,7 +48,6 @@ public class PropImitationHooks {
 
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
-    private static final String PACKAGE_FINSKY = "com.android.vending";
 
     private static final String G_ONE = "com.pubg.imobile";
     private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
@@ -127,7 +126,7 @@ public class PropImitationHooks {
 
     private static volatile String[] sCertifiedProps;
     private static volatile String sProcessName;
-    private static volatile boolean sIsGms, sIsPhotos, sIsFinsky;
+    private static volatile boolean sIsPhotos;
 
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
@@ -146,9 +145,7 @@ public class PropImitationHooks {
 
         sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
         sProcessName = processName;
-        sIsGms = packageName.equals(PACKAGE_GMS);
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
-        sIsFinsky = packageName.equals(PACKAGE_FINSKY);
 
         /* Set certified properties for GMSCore
          * Set Pixel 9 for Google and GMS device configurator
@@ -156,8 +153,7 @@ public class PropImitationHooks {
          */
 
         switch (processName) {
-            case PACKAGE_GMS:
-            case PACKAGE_FINSKY:
+            case PROCESS_GMS_UNSTABLE:
                 dlog("Setting certified props for: " + packageName + " process: " + processName);
                 setCertifiedPropsForGms();
                 return;
@@ -243,24 +239,6 @@ public class PropImitationHooks {
             dlog("Set system prop " + name + "=" + value);
         } catch (Exception e) {
             Log.e(TAG, "Failed to set system prop " + name + "=" + value, e);
-        }
-    }
-
-    private static boolean isCallerSafetyNet() {
-        return sIsGms && Arrays.stream(Thread.currentThread().getStackTrace())
-                .anyMatch(elem -> elem.getClassName().contains("DroidGuard"));
-    }
-
-    public static void onEngineGetCertificateChain() {
-        // If a keybox is found, don't block key attestation
-        if (KeyProviderManager.isKeyboxAvailable()) {
-            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
-            return;
-        }
-
-        // Check stack for SafetyNet or Play Integrity
-        if (isCallerSafetyNet() || sIsFinsky) {
-            throw new UnsupportedOperationException();
         }
     }
 
