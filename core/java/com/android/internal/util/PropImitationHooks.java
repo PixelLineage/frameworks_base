@@ -48,6 +48,7 @@ public class PropImitationHooks {
 
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
+    private static final String PACKAGE_FINSKY = "com.android.vending";
 
     private static final String G_ONE = "com.pubg.imobile";
     private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
@@ -154,6 +155,7 @@ public class PropImitationHooks {
 
         switch (processName) {
             case PROCESS_GMS_UNSTABLE:
+            case PACKAGE_FINSKY:
                 dlog("Setting certified props for: " + packageName + " process: " + processName);
                 setCertifiedPropsForGms();
                 return;
