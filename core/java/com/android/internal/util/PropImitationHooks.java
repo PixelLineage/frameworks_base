@@ -68,8 +68,8 @@ public class PropImitationHooks {
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String PROCESS_GMS_UPDATE = PACKAGE_GMS + ".update";
 
-    private static final String PROP_SECURITY_PATCH = "persist.sys.pihooks.security_patch";
-    private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.first_api_level";
+    private static final String PROP_SECURITY_PATCH = "persist.sys.pihooks.SECURITY_PATCH";
+    private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.DEVICE_INITIAL_SDK_INT";
 
     private static final Map<String, String> sPixelFiveProps = Map.of(
             "PRODUCT", "barbet",
