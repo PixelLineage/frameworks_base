@@ -68,9 +68,6 @@ public class PropImitationHooks {
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String PROCESS_GMS_UPDATE = PACKAGE_GMS + ".update";
 
-    private static final String PROP_SECURITY_PATCH = "persist.sys.pihooks.SECURITY_PATCH";
-    private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.DEVICE_INITIAL_SDK_INT";
-
     private static final Map<String, String> sPixelFiveProps = Map.of(
             "PRODUCT", "barbet",
             "DEVICE", "barbet",
@@ -240,9 +237,6 @@ public class PropImitationHooks {
             }
             setPropValue(fieldAndProp[0], fieldAndProp[1]);
         }
-        setSystemProperty(PROP_SECURITY_PATCH, Build.VERSION.SECURITY_PATCH);
-        setSystemProperty(PROP_FIRST_API_LEVEL,
-                Integer.toString(Build.VERSION.DEVICE_INITIAL_SDK_INT));
     }
 
     private static void spoofProvider() {
@@ -266,15 +260,6 @@ public class PropImitationHooks {
 
         Security.removeProvider("AndroidKeyStore");
         Security.insertProviderAt(customProvider, 1);
-    }
-
-    private static void setSystemProperty(String name, String value) {
-        try {
-            SystemProperties.set(name, value);
-            dlog("Set system prop " + name + "=" + value);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to set system prop " + name + "=" + value, e);
-        }
     }
 
     public static boolean hasSystemFeature(String name, boolean has) {
