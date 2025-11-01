@@ -213,6 +213,10 @@ public class PropImitationHooks {
     }
 
     private static void setCertifiedPropsForGms() {
+        if (android.os.Process.isIsolated()) {
+            dlog("Skipping Play Integrity props in isolated process");
+            return;
+        }
         if (sCertifiedProps.length == 0) {
             dlog("Certified props are not set");
             return;
