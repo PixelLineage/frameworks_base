@@ -33,11 +33,6 @@ import android.util.Log;
 
 import com.android.internal.R;
 
-import java.security.KeyStore;
-import java.security.KeyStoreSpi;
-import java.security.Provider;
-import java.security.Security;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -224,7 +219,6 @@ public class PropImitationHooks {
             dlog("Spoofing build for GMS");
             setCertifiedProps();
         }
-        spoofProvider();
     }
 
     private static void setCertifiedProps() {
@@ -237,29 +231,6 @@ public class PropImitationHooks {
             }
             setPropValue(fieldAndProp[0], fieldAndProp[1]);
         }
-    }
-
-    private static void spoofProvider() {
-        try {
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            Field keyStoreSpi = keyStore.getClass().getDeclaredField("keyStoreSpi");
-
-            keyStoreSpi.setAccessible(true);
-
-            CustomKeyStoreSpi.keyStoreSpi = (KeyStoreSpi) keyStoreSpi.get(keyStore);
-
-            keyStoreSpi.setAccessible(false);
-
-        } catch (Throwable t) {
-            Log.e(TAG, "Couldn't get keyStoreSpi field!", t);
-        }
-
-        Provider provider = Security.getProvider("AndroidKeyStore");
-
-        Provider customProvider = new CustomProvider(provider);
-
-        Security.removeProvider("AndroidKeyStore");
-        Security.insertProviderAt(customProvider, 1);
     }
 
     public static boolean hasSystemFeature(String name, boolean has) {
