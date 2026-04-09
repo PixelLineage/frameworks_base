@@ -46,12 +46,24 @@ public class PropImitationHooks {
     private static final String TAG = "PropImitationHooks";
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
+    private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
 
     private static final String G_ONE = "com.pubg.imobile";
     private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
     private static final String G_THR = "com.activision.callofduty.shooter";
     private static final String G_FOU = "com.tencent.tmgp.pubgmhd";
+
+    private static final Map<String, String> sPixelFiveProps = Map.of(
+            "PRODUCT", "barbet",
+            "DEVICE", "barbet",
+            "HARDWARE", "barbet",
+            "MANUFACTURER", "Google",
+            "BRAND", "google",
+            "MODEL", "Pixel 5a",
+            "ID", "AP2A.240805.005.S4",
+            "FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005.S4/12281092:user/release-keys"
+    );
 
     private static final Map<String, String> sPixelXLProps = Map.of(
             "PRODUCT", "marlin",
@@ -123,6 +135,9 @@ public class PropImitationHooks {
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
 
         switch (packageName) {
+            case PACKAGE_GMS:
+                setProps(sPixelFiveProps);
+                return;
             case PACKAGE_GPHOTOS:
                 dlog("Spoofing Pixel XL for Google Photos");
                 setProps(sPixelXLProps);
