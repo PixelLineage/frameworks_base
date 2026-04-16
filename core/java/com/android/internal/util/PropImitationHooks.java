@@ -75,8 +75,8 @@ public class PropImitationHooks {
             "FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005.S4/12281092:user/release-keys"
     );
 
-        private static final Map<String, String> sPixelFingerprintOnly = Map.of(
-            "FINGERPRINT", "google/bluejay/bluejay:16/CP1A.260405.005/15001963:user/release-keys"
+    private static final Map<String, String> sPixelFingerprintOnly = Map.of(
+            "FINGERPRINT", "google/bluejay_beta/bluejay:17/CP21.260306.017/15063635:user/release-keys"
     );
 
     private static final Map<String, String> sPixelXLProps = Map.of(
