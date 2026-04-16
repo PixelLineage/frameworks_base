@@ -7767,4 +7767,8 @@
     </string-array>
     <string-array name="device_configs_override" translatable="false">
     </string-array>
+
+    <!-- Build properties from a GMS certified device against current platform SPL level -->
+    <string-array name="config_certifiedBuildProperties" translatable="false">
+    </string-array>
 </resources>

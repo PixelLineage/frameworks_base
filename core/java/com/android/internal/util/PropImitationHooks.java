@@ -46,9 +46,15 @@ public class PropImitationHooks {
     private static final String TAG = "PropImitationHooks";
     private static final boolean DEBUG = SystemProperties.getBoolean("debug.pihooks.log", false);
 
+    private static final String PACKAGE_GMS = "com.google.android.gms";
+    private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
     private static final String PACKAGE_FINSKY = "com.android.vending";
 
-    private static final String PACKAGE_GMS = "com.google.android.gms";
+    private static final String G_ONE = "com.pubg.imobile";
+    private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
+    private static final String G_THR = "com.activision.callofduty.shooter";
+    private static final String G_FOU = "com.tencent.tmgp.pubgmhd";
+
     private static final String PROCESS_GMS_GAPPS = PACKAGE_GMS + ".gapps";
     private static final String PROCESS_GMS_GSERVICE = PACKAGE_GMS + ".gservice";
     private static final String PROCESS_GMS_LEARNING = PACKAGE_GMS + ".learning";
@@ -56,13 +62,6 @@ public class PropImitationHooks {
     private static final String PROCESS_GMS_SEARCH = PACKAGE_GMS + ".search";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String PROCESS_GMS_UPDATE = PACKAGE_GMS + ".update";
-
-    private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
-
-    private static final String G_ONE = "com.pubg.imobile";
-    private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
-    private static final String G_THR = "com.activision.callofduty.shooter";
-    private static final String G_FOU = "com.tencent.tmgp.pubgmhd";
 
     private static final Map<String, String> sPixelFiveProps = Map.of(
             "PRODUCT", "barbet",
@@ -73,10 +72,6 @@ public class PropImitationHooks {
             "MODEL", "Pixel 5a",
             "ID", "AP2A.240805.005.S4",
             "FINGERPRINT", "google/barbet/barbet:14/AP2A.240805.005.S4/12281092:user/release-keys"
-    );
-
-    private static final Map<String, String> sPixelFingerprintOnly = Map.of(
-            "FINGERPRINT", "google/bluejay_beta/bluejay:17/CP21.260306.017/15063635:user/release-keys"
     );
 
     private static final Map<String, String> sPixelXLProps = Map.of(
@@ -127,6 +122,7 @@ public class PropImitationHooks {
             "PIXEL_2021_MIDYEAR_EXPERIENCE"
     );
 
+    private static volatile String[] sCertifiedProps;
     private static volatile String sProcessName;
     private static volatile boolean sIsPhotos;
 
@@ -145,14 +141,20 @@ public class PropImitationHooks {
             return;
         }
 
+        sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
         sProcessName = processName;
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
+
+        /* Set certified properties for GMSCore
+         * Set Pixel 9 for Google and GMS device configurator
+         * Set Pixel XL for Google Photos
+         */
 
         switch (processName) {
             case PROCESS_GMS_UNSTABLE:
             case PACKAGE_FINSKY:
                 dlog("Setting certified props for: " + packageName + " process: " + processName);
-                setProps(sPixelFingerprintOnly);
+                setCertifiedPropsForGms();
                 return;
             case PROCESS_GMS_PERSISTENT:
             case PROCESS_GMS_GAPPS:
@@ -160,6 +162,7 @@ public class PropImitationHooks {
             case PROCESS_GMS_LEARNING:
             case PROCESS_GMS_SEARCH:
             case PROCESS_GMS_UPDATE:
+                dlog("Spoofing Pixel 5a for: " + packageName + " process: " + processName);
                 setProps(sPixelFiveProps);
                 return;
         }
@@ -201,6 +204,32 @@ public class PropImitationHooks {
             field.setAccessible(false);
         } catch (Exception e) {
             Log.e(TAG, "Failed to set prop " + key, e);
+        }
+    }
+
+    private static void setCertifiedPropsForGms() {
+        if (android.os.Process.isIsolated()) {
+            dlog("Skipping Play Integrity props in isolated process");
+            return;
+        }
+        if (sCertifiedProps.length == 0) {
+            dlog("Certified props are not set");
+            return;
+        } else {
+            dlog("Spoofing build for GMS");
+            setCertifiedProps();
+        }
+    }
+
+    private static void setCertifiedProps() {
+        for (String entry : sCertifiedProps) {
+            // Each entry must be of the format FIELD:value
+            final String[] fieldAndProp = entry.split(":", 2);
+            if (fieldAndProp.length != 2) {
+                Log.e(TAG, "Invalid entry in certified props: " + entry);
+                continue;
+            }
+            setPropValue(fieldAndProp[0], fieldAndProp[1]);
         }
     }
 
