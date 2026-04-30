@@ -54,6 +54,7 @@ public class PropImitationHooks {
     private static final String G_TWO = "com.gameloft.android.ANMP.GloftA9HM";
     private static final String G_THR = "com.activision.callofduty.shooter";
     private static final String G_FOU = "com.tencent.tmgp.pubgmhd";
+    private static final String G_FIV = "com.tencent.ig";
 
     private static final String PROCESS_GMS_GAPPS = PACKAGE_GMS + ".gapps";
     private static final String PROCESS_GMS_GSERVICE = PACKAGE_GMS + ".gservice";
@@ -174,6 +175,7 @@ public class PropImitationHooks {
                 return;
             case G_ONE:
             case G_FOU:
+            case G_FIV:
                 setProps(sGameProps);
                 return;
             case G_TWO:
