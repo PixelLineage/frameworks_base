@@ -23,15 +23,12 @@ import android.app.Application;
 import android.app.TaskStackListener;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Binder;
-import android.os.Process;
 import android.os.SystemProperties;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.android.internal.R;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -64,6 +61,9 @@ public class PropImitationHooks {
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String PROCESS_GMS_UPDATE = PACKAGE_GMS + ".update";
 
+    private static final String SETTING_CERTIFIED_FINGERPRINT = "certified_build_fingerprint";
+    private static final String SETTING_CERTIFIED_SECURITY_PATCH = "certified_build_security_patch";
+    private static final String SETTING_CERTIFIED_INITIAL_SDK = "certified_build_initial_sdk";
     private static final Map<String, String> sPixelFiveProps = Map.of(
             "PRODUCT", "barbet",
             "DEVICE", "barbet",
@@ -136,13 +136,6 @@ public class PropImitationHooks {
             return;
         }
 
-        final Resources res = context.getResources();
-        if (res == null) {
-            Log.e(TAG, "Null resources");
-            return;
-        }
-
-        sCertifiedProps = res.getStringArray(R.array.config_certifiedBuildProperties);
         sProcessName = processName;
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
 
@@ -155,6 +148,7 @@ public class PropImitationHooks {
             case PROCESS_GMS_UNSTABLE:
             case PACKAGE_FINSKY:
                 dlog("Setting certified props for: " + packageName + " process: " + processName);
+                sCertifiedProps = getCertifiedProps(context);
                 setCertifiedPropsForGms();
                 return;
             case PROCESS_GMS_PERSISTENT:
@@ -191,6 +185,27 @@ public class PropImitationHooks {
         props.forEach(PropImitationHooks::setPropValue);
     }
 
+    private static String[] getCertifiedProps(Context context) {
+        final String fingerprint = getSetting(context, SETTING_CERTIFIED_FINGERPRINT);
+        final String securityPatch = getSetting(context, SETTING_CERTIFIED_SECURITY_PATCH);
+        final String initialSdk = getSetting(context, SETTING_CERTIFIED_INITIAL_SDK);
+
+        if (TextUtils.isEmpty(fingerprint) || TextUtils.isEmpty(securityPatch)
+                || TextUtils.isEmpty(initialSdk)) {
+            return new String[0];
+        }
+
+        return new String[] {
+                "FINGERPRINT:" + fingerprint,
+                "VERSION.SECURITY_PATCH:" + securityPatch,
+                "VERSION.DEVICE_INITIAL_SDK_INT:" + initialSdk,
+        };
+    }
+
+    private static String getSetting(Context context, String settingName) {
+        return Settings.Global.getString(context.getContentResolver(), settingName);
+    }
+
     private static void setPropValue(String key, String value) {
         try {
             dlog("Setting prop " + key + " to " + value.toString());
@@ -214,7 +229,7 @@ public class PropImitationHooks {
             dlog("Skipping Play Integrity props in isolated process");
             return;
         }
-        if (sCertifiedProps.length == 0) {
+        if (sCertifiedProps == null || sCertifiedProps.length == 0) {
             dlog("Certified props are not set");
             return;
         } else {
